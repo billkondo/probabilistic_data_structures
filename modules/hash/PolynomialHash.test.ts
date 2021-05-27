@@ -1,4 +1,4 @@
-import PolynomialHash from './polynomial_hash';
+import PolynomialHash from './PolynomialHash';
 
 test('Polynomial hash with M = 53 and MOD = 1e9 + 9', () => {
   const polynomialHash = new PolynomialHash();

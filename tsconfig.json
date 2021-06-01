@@ -13,5 +13,9 @@
     "typeRoots": [
       "./node_modules/@types",
     ],
+    "allowJs": true,
+  },
+  "ts-node": {
+    "require": ["tsconfig-paths/register"]
   }
 }

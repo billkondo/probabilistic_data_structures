@@ -76,6 +76,29 @@ struct LogLog {
   }
 };
 
+struct SuperLogLog : public LogLog {
+  double modified_alpha;
+
+  SuperLogLog(int k) : LogLog(k) {
+    modified_alpha = 0.47221;
+  }
+
+  int count() {
+    vector<int> mm;
+    mm.resize(m, 0);
+    for (int i = 0; i < m; ++i) mm[i] = M[i];
+
+    sort(mm.begin(), mm.end());
+
+    int cutoff = 0.70 * m;
+    double z = 0;
+    for (int i = 0; i < cutoff; ++i) z += M[i];
+    z /= cutoff;
+
+    return floor(0.5392 * cutoff * pow(2.0, z));
+  }
+};
+
 double relative_error(double a, double b) {
   return abs(b - a) / b;
 }
@@ -99,7 +122,7 @@ void* work(void *args) {
 
   for (int i = 1; i <= M; ++i) {
     Naive naive = Naive();
-    LogLog loglog = LogLog(8);
+    SuperLogLog loglog = SuperLogLog(8);
 
     while (naive.count() < N) {
       int x = rand() % NMax;

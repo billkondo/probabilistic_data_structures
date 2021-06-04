@@ -1,14 +1,11 @@
-import CountDistinctInterface from 'count_distinct/CountDistinctInterface';
+import CountDistinctInterface from 'count_distinct/js/CountDistinctInterface';
 
 class NaiveCountDistinct implements CountDistinctInterface {
-  hashTable: { [key: string]: boolean };
+  hashTable: { [key: string]: boolean } = {};
 
-  size: number;
+  size: number = 0;
 
-  constructor() {
-    this.hashTable = {};
-    this.size = 0;
-  }
+  constructor() {}
 
   add(element: string) {
     if (this.hashTable[element]) return;
@@ -19,6 +16,11 @@ class NaiveCountDistinct implements CountDistinctInterface {
 
   count(): number {
     return this.size;
+  }
+
+  init() {
+    this.size = 0;
+    this.hashTable = {};
   }
 }
 

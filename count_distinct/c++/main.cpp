@@ -11,6 +11,9 @@
 
 #include <pthread.h>
 
+#include "LogLog.hpp"
+#include "SuperLogLog.hpp"
+
 using namespace std;
 
 using Json = nlohmann::json;
@@ -37,68 +40,6 @@ struct Naive {
   }
 };
 
-struct LogLog {
-  int K;
-  int m;
-  vector<int> M;
-  int mask;
-
-  double alpha = 0.39701;
-
-  LogLog(int K) : K(K) {
-    m = (1 << K);
-    M.resize(m, 0);
-    
-    mask = 0;
-    for (int i = 0; i < K; ++i)
-      mask += (1 << i);
-  }
-
-  int rank(int x) {
-    int i = 0;
-    while (!((1 << i) & x) && (1 << i) <= x) ++i;
-    return i + 1;
-  }
-
-  void add(int x) {
-    int j = mask & x;
-    int w = x >> K;
-
-    M[j] = max(M[j], rank(w));
-  }
-
-  int count() {
-    double z = 0;
-    for (int i = 0; i < m; ++i)
-      z += M[i];
-    z /= m;
-    return floor(alpha * m * pow(2.0, z));
-  }
-};
-
-struct SuperLogLog : public LogLog {
-  double modified_alpha;
-
-  SuperLogLog(int k) : LogLog(k) {
-    modified_alpha = 0.47221;
-  }
-
-  int count() {
-    vector<int> mm;
-    mm.resize(m, 0);
-    for (int i = 0; i < m; ++i) mm[i] = M[i];
-
-    sort(mm.begin(), mm.end());
-
-    int cutoff = 0.70 * m;
-    double z = 0;
-    for (int i = 0; i < cutoff; ++i) z += M[i];
-    z /= cutoff;
-
-    return floor(0.5392 * cutoff * pow(2.0, z));
-  }
-};
-
 double relative_error(double a, double b) {
   return abs(b - a) / b;
 }
@@ -122,7 +63,7 @@ void* work(void *args) {
 
   for (int i = 1; i <= M; ++i) {
     Naive naive = Naive();
-    SuperLogLog loglog = SuperLogLog(8);
+    LogLog loglog = LogLog(8);
 
     while (naive.count() < N) {
       int x = rand() % NMax;
@@ -151,7 +92,7 @@ int main() {
 
   srand(time(NULL));
   
-  int Threads = 4;
+  int Threads = 8;
 
   pthread_t threads[Threads];
   struct work_data data[Threads];

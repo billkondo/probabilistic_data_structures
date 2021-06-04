@@ -13,6 +13,7 @@
 
 #include "LogLog.hpp"
 #include "SuperLogLog.hpp"
+#include "HyperLogLog.hpp"
 
 using namespace std;
 
@@ -63,7 +64,7 @@ void* work(void *args) {
 
   for (int i = 1; i <= M; ++i) {
     Naive naive = Naive();
-    LogLog loglog = LogLog(8);
+    HyperLogLog loglog = HyperLogLog(8);
 
     while (naive.count() < N) {
       int x = rand() % NMax;
